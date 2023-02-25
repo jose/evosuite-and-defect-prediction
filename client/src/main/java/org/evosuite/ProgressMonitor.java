@@ -33,16 +33,16 @@ import java.io.Serializable;
  * <p>
  * ProgressMonitor class.
  * </p>
- * 
+ *
  * @author gordon
  */
 public class ProgressMonitor<T extends Chromosome<T>> implements SearchListener<T>, Serializable {
 
-	private static final long serialVersionUID = -8518559681906649686L;
+    private static final long serialVersionUID = -8518559681906649686L;
 
-	private StoppingCondition<T> stoppingCondition;
-	private long max;
-	private int currentCoverage;
+    private StoppingCondition<T> stoppingCondition;
+    private long max;
+    private int currentCoverage;
 
 	protected int lastCoverage;
 	protected int lastProgress;
@@ -50,15 +50,15 @@ public class ProgressMonitor<T extends Chromosome<T>> implements SearchListener<
 	protected double fitnessValue;
 	protected ClientState state;
 
-	public ProgressMonitor() {
-		stoppingCondition = null;
-		max = 1;
-		currentCoverage = 0;
-		lastCoverage = 0;
-		lastProgress = 0;
-		iteration = 0;
-		state = ClientState.INITIALIZATION;
-	}
+    public ProgressMonitor() {
+        stoppingCondition = null;
+        max = 1;
+        currentCoverage = 0;
+        lastCoverage = 0;
+        lastProgress = 0;
+        iteration = 0;
+        state = ClientState.INITIALIZATION;
+    }
 
 	public ProgressMonitor(ProgressMonitor<T> that) {
 		this.stoppingCondition = that.stoppingCondition.clone();
@@ -97,20 +97,9 @@ public class ProgressMonitor<T extends Chromosome<T>> implements SearchListener<
 		//out.writeObject(currentTask);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.evosuite.ga.SearchListener#searchStarted(org.evosuite.ga.GeneticAlgorithm)
-	 */
-	/** {@inheritDoc} */
-	@Override
-	public void searchStarted(GeneticAlgorithm<T> algorithm) {
-		for(StoppingCondition<T> cond : algorithm.getStoppingConditions()) {
-			if(cond.getLimit() == 0) // No ZeroStoppingCondition
-				continue;
-			stoppingCondition = cond;
-			max = stoppingCondition.getLimit();
-			break;
-		}
-	}
+    /* (non-Javadoc)
+     * @see org.evosuite.ga.SearchListener#searchStarted(org.evosuite.ga.GeneticAlgorithm)
+     */
 
 	/* (non-Javadoc)
 	 * @see org.evosuite.ga.SearchListener#iteration(org.evosuite.ga.GeneticAlgorithm)
@@ -153,15 +142,32 @@ public class ProgressMonitor<T extends Chromosome<T>> implements SearchListener<
 			updateStatus(current);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.evosuite.ga.SearchListener#modification(org.evosuite.ga.Chromosome)
-	 */
-	/** {@inheritDoc} */
-	@Override
-	public void modification(T individual) {
-		// TODO Auto-generated method stub
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void searchStarted(GeneticAlgorithm<T> algorithm) {
+        for (StoppingCondition<T> cond : algorithm.getStoppingConditions()) {
+            if (cond.getLimit() == 0) // No ZeroStoppingCondition
+                continue;
+            stoppingCondition = cond;
+            max = stoppingCondition.getLimit();
+            break;
+        }
+    }
 
-	}
+    /* (non-Javadoc)
+     * @see org.evosuite.ga.SearchListener#modification(org.evosuite.ga.Chromosome)
+     */
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void modification(T individual) {
+        // TODO Auto-generated method stub
+
+    }
 
 
 }

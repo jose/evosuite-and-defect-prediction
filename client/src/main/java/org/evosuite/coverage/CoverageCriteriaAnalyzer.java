@@ -26,9 +26,9 @@ import org.evosuite.coverage.aes.AbstractAESCoverageSuiteFitness.Metric;
 import org.evosuite.coverage.aes.branch.AESBranchCoverageSuiteFitness;
 import org.evosuite.coverage.aes.method.AESMethodCoverageSuiteFitness;
 import org.evosuite.coverage.aes.method.AESPublicMethodCoverageSuiteFitness;
+import org.evosuite.TestGenerationContext;
 import org.evosuite.coverage.ambiguity.AmbiguityCoverageSuiteFitness;
 import org.evosuite.coverage.rho.RhoCoverageSuiteFitness;
-import org.evosuite.TestGenerationContext;
 import org.evosuite.rmi.ClientServices;
 import org.evosuite.statistics.RuntimeVariable;
 import org.evosuite.testcase.DefaultTestCase;
@@ -46,13 +46,12 @@ import java.util.*;
 
 /**
  * @author Gordon Fraser
- *
  */
 public class CoverageCriteriaAnalyzer {
 
     private static final Logger logger = LoggerFactory.getLogger(CoverageCriteriaAnalyzer.class);
 
-    private static Map<String, StringBuffer> coverageBitString = new TreeMap<>();
+    private static final Map<String, StringBuffer> coverageBitString = new TreeMap<>();
 
     private static boolean isMutationCriterion(Properties.Criterion criterion) {
         switch (criterion) {
@@ -114,7 +113,7 @@ public class CoverageCriteriaAnalyzer {
         }
 
         boolean reinstrumented = false;
-        for (String extraCriterion : Arrays.asList(criteria.toUpperCase().split(","))) {
+        for (String extraCriterion : criteria.toUpperCase().split(",")) {
             if (extraCriterion.equals("CBRANCH")) {
                 Properties.INSTRUMENT_METHOD_CALLS = true;
             }
@@ -227,7 +226,7 @@ public class CoverageCriteriaAnalyzer {
     }
 
     public static void analyzeCoverage(TestSuiteChromosome testSuite, Properties.Criterion criterion) {
-        analyzeCoverage(testSuite,criterion,true);
+        analyzeCoverage(testSuite, criterion, true);
     }
 
     private static void analyzeCoverage(TestSuiteChromosome testSuite, Properties.Criterion criterion, boolean recalculate) {
@@ -236,7 +235,7 @@ public class CoverageCriteriaAnalyzer {
 
         TestFitnessFactory<? extends TestFitnessFunction> factory = FitnessFunctions.getFitnessFactory(criterion);
 
-        if(recalculate) {
+        if (recalculate) {
             reinstrument(testSuiteCopy, criterion);
 
             for (TestChromosome test : testSuiteCopy.getTestChromosomes()) {
@@ -267,7 +266,7 @@ public class CoverageCriteriaAnalyzer {
                 logger.debug("Goal {} is not covered", goal);
                 buffer.append("0");
                 if (Properties.PRINT_MISSED_GOALS)
-                    LoggingUtils.getEvoLogger().info(" - Missed goal {}", goal.toString());
+                    LoggingUtils.getEvoLogger().info(" - Missed goal {}", goal);
             }
         }
 
