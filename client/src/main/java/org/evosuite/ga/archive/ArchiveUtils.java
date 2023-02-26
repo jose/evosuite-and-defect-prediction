@@ -114,7 +114,8 @@ public final class ArchiveUtils {
                     }
                     break;
                 case AMBIGUITY:
-                    if (goal instanceof LineCoverageTestFitness) {
+                case VDDU:
+                    if (goal instanceof MethodCoverageTestFitness || goal instanceof BranchCoverageTestFitness) {
                         return true;
                     }
                     break;
@@ -181,6 +182,7 @@ public final class ArchiveUtils {
                     }
                     break;
                 default:
+
                     AtMostOnceLogger.warn(logger, "Unknown criterion '" + criterion.name() + "'");
                     break;
             }
