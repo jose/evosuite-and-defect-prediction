@@ -57,10 +57,7 @@ public class ConsoleProgressBar implements Listener<ClientStateInformation> {
         int coverage = event.getCoverage();
         double fitnessValue = event.getFitnessValue();
 
-
-
         StringBuilder bar = new StringBuilder("[Progress:");
-        bar.append("[Fitness Value = ").append(fitnessValue).append("]\n");
 
         for (int i = 0; i < 30; i++) {
             if (i < (int) (percent * 0.30)) {
@@ -72,7 +69,7 @@ public class ConsoleProgressBar implements Listener<ClientStateInformation> {
             }
         }
 
-        bar.append(Math.min(99, percent)).append("%] [Cov:");
+        bar.append(Math.min(100, percent)).append("%] [Cov:");
 
         for (int i = 0; i < 35; i++) {
             if (i < (int) (coverage * 0.35)) {
@@ -85,6 +82,8 @@ public class ConsoleProgressBar implements Listener<ClientStateInformation> {
         }
 
         bar.append(coverage).append("%]");
+
+        bar.append(" [Fitness Value: ").append(fitnessValue).append("]");
 
         System.out.print("\r" + bar);
 

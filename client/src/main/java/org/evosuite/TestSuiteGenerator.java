@@ -626,6 +626,9 @@ public class TestSuiteGenerator {
             TestCaseExecutor.getInstance().addObserver(checker);
         }
 
+        logger.warn("Criterion: " + Arrays.toString(Properties.CRITERION));
+        logger.warn("Algorithm: " + Properties.ALGORITHM);
+        logger.warn("Strategy: " + Properties.STRATEGY);
         TestGenerationStrategy strategy = TestSuiteGeneratorHelper.getTestGenerationStrategy();
         TestSuiteChromosome testSuite = strategy.generateTests();
 
