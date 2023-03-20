@@ -29,10 +29,10 @@ import java.util.Scanner;
 
 public class SystemInUtilTest {
 
-	@After
-	public void tearDown(){
-		SystemInUtil.resetSingleton();
-	}
+    @After
+    public void tearDown() {
+        SystemInUtil.resetSingleton();
+    }
 
     @Test(timeout = 3000)
     public void testDoubleExecution() {

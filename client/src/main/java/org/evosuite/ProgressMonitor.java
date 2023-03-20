@@ -44,11 +44,11 @@ public class ProgressMonitor<T extends Chromosome<T>> implements SearchListener<
     private long max;
     private int currentCoverage;
 
-	protected int lastCoverage;
-	protected int lastProgress;
-	protected int iteration;
-	protected double fitnessValue;
-	protected ClientState state;
+    protected int lastCoverage;
+    protected int lastProgress;
+    protected int iteration;
+    protected ClientState state;
+    protected double fitnessValue;
 
     public ProgressMonitor() {
         stoppingCondition = null;
@@ -60,87 +60,45 @@ public class ProgressMonitor<T extends Chromosome<T>> implements SearchListener<
         state = ClientState.INITIALIZATION;
     }
 
-	public ProgressMonitor(ProgressMonitor<T> that) {
-		this.stoppingCondition = that.stoppingCondition.clone();
-		this.max = that.max;
-		this.currentCoverage = that.currentCoverage;
-		this.lastCoverage = that.lastCoverage;
-		this.lastProgress = that.lastProgress;
-		this.iteration = that.iteration;
-		this.state = that.state;
-		this.fitnessValue = that.fitnessValue;
-	}
+    public ProgressMonitor(ProgressMonitor<T> that) {
+        this.stoppingCondition = that.stoppingCondition.clone();
+        this.max = that.max;
+        this.currentCoverage = that.currentCoverage;
+        this.lastCoverage = that.lastCoverage;
+        this.lastProgress = that.lastProgress;
+        this.iteration = that.iteration;
+        this.state = that.state;
+        this.fitnessValue = that.fitnessValue;
+    }
 
-	/**
-	 * <p>
-	 * updateStatus
-	 * </p>
-	 * 
-	 * @param percent
-	 *            a int.
-	 */
-	public void updateStatus(int percent) {
-		ClientState state = ClientState.SEARCH;
-		ClientStateInformation information = new ClientStateInformation(state);
-		information.setCoverage(currentCoverage);
-		information.setProgress(percent);
-		information.setIteration(iteration);
-		information.setFitnessValue(fitnessValue);
-		//LoggingUtils.getEvoLogger().info("Setting to: "+state.getNumPhase()+": "+information.getCoverage()+"/"+information.getProgress());
-		ClientServices.getInstance().getClientNode().changeState(state, information);
-		lastProgress = percent;
-		lastCoverage = currentCoverage;
-		//out.writeInt(percent);
-		//out.writeInt(currentPhase);
-		//out.writeInt(phases);
-		//out.writeInt(currentCoverage);
-		//out.writeObject(currentTask);
-	}
+    /**
+     * <p>
+     * updateStatus
+     * </p>
+     *
+     * @param percent a int.
+     */
+    public void updateStatus(int percent) {
+        ClientState state = ClientState.SEARCH;
+        ClientStateInformation information = new ClientStateInformation(state);
+        information.setCoverage(currentCoverage);
+        information.setProgress(percent);
+        information.setIteration(iteration);
+        information.setFitnessValue(fitnessValue);
+        //LoggingUtils.getEvoLogger().info("Setting to: "+state.getNumPhase()+": "+information.getCoverage()+"/"+information.getProgress());
+        ClientServices.getInstance().getClientNode().changeState(state, information);
+        lastProgress = percent;
+        lastCoverage = currentCoverage;
+        //out.writeInt(percent);
+        //out.writeInt(currentPhase);
+        //out.writeInt(phases);
+        //out.writeInt(currentCoverage);
+        //out.writeObject(currentTask);
+    }
 
     /* (non-Javadoc)
      * @see org.evosuite.ga.SearchListener#searchStarted(org.evosuite.ga.GeneticAlgorithm)
      */
-
-	/* (non-Javadoc)
-	 * @see org.evosuite.ga.SearchListener#iteration(org.evosuite.ga.GeneticAlgorithm)
-	 */
-	/** {@inheritDoc} */
-	@Override
-	public void iteration(GeneticAlgorithm<T> algorithm) {
-		long current = stoppingCondition.getCurrentValue();
-		currentCoverage = (int) Math.floor(algorithm.getBestIndividual().getCoverage() * 100);
-		fitnessValue = algorithm.getBestIndividual().getFitness();
-		updateStatus((int) (100 * current / max));
-
-		iteration++;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.evosuite.ga.SearchListener#searchFinished(org.evosuite.ga.GeneticAlgorithm)
-	 */
-	/** {@inheritDoc} */
-	@Override
-	public void searchFinished(GeneticAlgorithm<T> algorithm) {
-		currentCoverage = (int) Math.floor(algorithm.getBestIndividual().getCoverage() * 100);
-		fitnessValue = algorithm.getBestIndividual().getFitness();
-		if(currentCoverage > lastCoverage) {
-			updateStatus((int) (100 * stoppingCondition.getCurrentValue() / max));
-		}
-		// System.out.println("");
-	}
-
-	/* (non-Javadoc)
-	 * @see org.evosuite.ga.SearchListener#fitnessEvaluation(org.evosuite.ga.Chromosome)
-	 */
-	/** {@inheritDoc} */
-	@Override
-	public void fitnessEvaluation(T individual) {
-		int current = (int) ((int)(100 * stoppingCondition.getCurrentValue())/max);
-		fitnessValue = individual.getFitness();
-		currentCoverage = (int) Math.floor(individual.getCoverage() * 100);
-		if(currentCoverage > lastCoverage || current > lastProgress)
-			updateStatus(current);
-	}
 
     /**
      * {@inheritDoc}
@@ -154,6 +112,55 @@ public class ProgressMonitor<T extends Chromosome<T>> implements SearchListener<
             max = stoppingCondition.getLimit();
             break;
         }
+    }
+
+    /* (non-Javadoc)
+     * @see org.evosuite.ga.SearchListener#iteration(org.evosuite.ga.GeneticAlgorithm)
+     */
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void iteration(GeneticAlgorithm<T> algorithm) {
+        long current = stoppingCondition.getCurrentValue();
+        currentCoverage = (int) Math.floor(algorithm.getBestIndividual().getCoverage() * 100);
+        fitnessValue = algorithm.getBestIndividual().getFitness();
+        updateStatus((int) (100 * current / max));
+        iteration++;
+    }
+
+    /* (non-Javadoc)
+     * @see org.evosuite.ga.SearchListener#searchFinished(org.evosuite.ga.GeneticAlgorithm)
+     */
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void searchFinished(GeneticAlgorithm<T> algorithm) {
+        currentCoverage = (int) Math.floor(algorithm.getBestIndividual().getCoverage() * 100);
+        fitnessValue = algorithm.getBestIndividual().getFitness();
+        if (currentCoverage > lastCoverage) {
+            updateStatus((int) (100 * stoppingCondition.getCurrentValue() / max));
+        }
+        // System.out.println("");
+    }
+
+    /* (non-Javadoc)
+     * @see org.evosuite.ga.SearchListener#fitnessEvaluation(org.evosuite.ga.Chromosome)
+     */
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fitnessEvaluation(T individual) {
+        int current = (int) ((int) (100 * stoppingCondition.getCurrentValue()) / max);
+        fitnessValue = individual.getFitness();
+        currentCoverage = (int) Math.floor(individual.getCoverage() * 100);
+        if (currentCoverage > lastCoverage || current > lastProgress)
+            updateStatus(current);
     }
 
     /* (non-Javadoc)

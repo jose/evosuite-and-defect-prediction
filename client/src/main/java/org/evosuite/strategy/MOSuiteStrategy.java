@@ -80,8 +80,6 @@ public class MOSuiteStrategy extends TestGenerationStrategy {
 
         for (TestFitnessFactory<? extends TestFitnessFunction> f : goalFactories) {
             for (TestFitnessFunction goal : f.getCoverageGoals()) {
-                // LOST: pq esta a utilizar esta mock
-                // depois chama a mock e da asneira
                 FitnessFunction<TestSuiteChromosome> mock = new TestSuiteFitnessFunctionMock(goal);
                 fitnessFunctions.add(mock);
             }

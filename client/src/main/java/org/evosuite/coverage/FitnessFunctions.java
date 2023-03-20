@@ -70,14 +70,6 @@ import java.util.Arrays;
  */
 public class FitnessFunctions {
 
-
-    /**
-     * Converts a {@link org.evosuite.Properties.Criterion} object to a
-     * {@link org.evosuite.testcase.TestFitnessFunction} class.
-     *
-     * @param criterion a {@link org.evosuite.Properties.Criterion} object.
-     * @return a {@link java.lang.Class} object.
-     */
     private static final Logger logger = LoggerFactory.getLogger(FitnessFunctions.class);
 
     /**
@@ -91,10 +83,11 @@ public class FitnessFunctions {
     public static TestSuiteFitnessFunction getFitnessFunction(Criterion criterion) {
         switch (criterion) {
             case STRONGMUTATION:
-            case MUTATION:
                 return new StrongMutationSuiteFitness();
             case WEAKMUTATION:
                 return new WeakMutationSuiteFitness();
+            case MUTATION:
+                return new StrongMutationSuiteFitness();
             case ONLYMUTATION:
                 return new OnlyMutationSuiteFitness();
             case DEFUSE:
@@ -210,6 +203,7 @@ public class FitnessFunctions {
             case METHODNOEXCEPTION:
                 return new MethodNoExceptionCoverageFactory();
             case LINE:
+                return new LineCoverageFactory();
             case ONLYLINE:
                 return new LineCoverageFactory();
             case OUTPUT:
@@ -286,6 +280,7 @@ public class FitnessFunctions {
             case METHODNOEXCEPTION:
                 return MethodNoExceptionCoverageTestFitness.class;
             case ONLYLINE:
+                return LineCoverageTestFitness.class;
             case LINE:
                 return LineCoverageTestFitness.class;
             case OUTPUT:
@@ -311,4 +306,5 @@ public class FitnessFunctions {
                 throw new RuntimeException("No criterion defined for " + criterion.name());
         }
     }
+
 }

@@ -45,117 +45,117 @@ import java.util.Set;
  */
 public class TestSuiteGeneratorHelper {
 
-  static void printTestCriterion(Criterion criterion) {
-    switch (criterion) {
-      case WEAKMUTATION:
-        LoggingUtils.getEvoLogger().info("  - Mutation testing (weak)");
-        break;
-      case ONLYMUTATION:
-        LoggingUtils.getEvoLogger().info("  - Only Mutation testing (weak)");
-        break;
-      case STRONGMUTATION:
-      case MUTATION:
-        LoggingUtils.getEvoLogger().info("  - Mutation testing (strong)");
-        break;
-      case DEFUSE:
-        LoggingUtils.getEvoLogger().info("  - All DU Pairs");
-        break;
-      case STATEMENT:
-        LoggingUtils.getEvoLogger().info("  - Statement Coverage");
-        break;
-      case RHO:
-        LoggingUtils.getEvoLogger().info("  - Rho Coverage");
-        break;
-      case AMBIGUITY:
-        LoggingUtils.getEvoLogger().info("  - Ambiguity Coverage");
-        break;
-      case ALLDEFS:
-        LoggingUtils.getEvoLogger().info("  - All Definitions");
-        break;
-      case EXCEPTION:
-        LoggingUtils.getEvoLogger().info("  - Exception");
-        break;
-      case ONLYBRANCH:
-        LoggingUtils.getEvoLogger().info("  - Only-Branch Coverage");
-        break;
-      case METHODTRACE:
-        LoggingUtils.getEvoLogger().info("  - Method Coverage");
-        break;
-      case METHOD:
-        LoggingUtils.getEvoLogger().info("  - Top-Level Method Coverage");
-        break;
-      case METHODNOEXCEPTION:
-        LoggingUtils.getEvoLogger().info("  - No-Exception Top-Level Method Coverage");
-        break;
-      case LINE:
-        LoggingUtils.getEvoLogger().info("  - Line Coverage");
-        break;
-      case ONLYLINE:
-        LoggingUtils.getEvoLogger().info("  - Only-Line Coverage");
-        break;
-      case OUTPUT:
-        LoggingUtils.getEvoLogger().info("  - Method-Output Coverage");
-        break;
-      case INPUT:
-        LoggingUtils.getEvoLogger().info("  - Method-Input Coverage");
-        break;
-      case BRANCH:
-        LoggingUtils.getEvoLogger().info("  - Branch Coverage");
-        break;
-      case CBRANCH:
-        LoggingUtils.getEvoLogger().info("  - Context Branch Coverage");
-        break;
-      case IBRANCH:
-        LoggingUtils.getEvoLogger().info("  - Interprocedural Context Branch Coverage");
-        break;
-      case TRYCATCH:
-        LoggingUtils.getEvoLogger().info("  - Try-Catch Branch Coverage");
-        break;
-      case VDDU:
-        LoggingUtils.getEvoLogger().info("  - VDDU Method Coverage");
-        break;
-      case VMDDU:
-        LoggingUtils.getEvoLogger().info("  - VMDDU Method Coverage");
-        break;
-      case VCDDU:
-        LoggingUtils.getEvoLogger().info("  - VCDDU Method Coverage");
-        break;
-      case VCMDDU1:
-        LoggingUtils.getEvoLogger().info("  - VCMDDU1 Method Coverage");
-        break;
-      case VCMDDU2:
-        LoggingUtils.getEvoLogger().info("  - VCMDDU2 Method Coverage");
-        break;
-      case VRDDU:
-        LoggingUtils.getEvoLogger().info("  - VRDDU Method Coverage");
-        break;
-      case DDU_METHOD:
-        LoggingUtils.getEvoLogger().info("  - DDU Method Coverage");
-        break;
-      case DDU_METHOD_DTR:
-        LoggingUtils.getEvoLogger().info("  - DDU Method (DTR) Coverage");
-        break;
-      case DDU_PUBLIC_METHOD:
-        LoggingUtils.getEvoLogger().info("  - DDU Public Method Coverage");
-        break;
-      case DDU_PUBLIC_METHOD_DTR:
-        LoggingUtils.getEvoLogger().info("  - DDU Public Method (DTR) Coverage");
-        break;
-      case DDU_BRANCH:
-        LoggingUtils.getEvoLogger().info("  - DDU Branch Coverage");
-        break;
-      case DDU_BRANCH_DTR:
-        LoggingUtils.getEvoLogger().info("  - DDU Branch Coverage");
-        break;
-      default:
-        throw new IllegalArgumentException("Unrecognized criterion: " + criterion);
+    static void printTestCriterion(Criterion criterion) {
+        switch (criterion) {
+            case WEAKMUTATION:
+                LoggingUtils.getEvoLogger().info("  - Mutation testing (weak)");
+                break;
+            case ONLYMUTATION:
+                LoggingUtils.getEvoLogger().info("  - Only Mutation testing (weak)");
+                break;
+            case STRONGMUTATION:
+            case MUTATION:
+                LoggingUtils.getEvoLogger().info("  - Mutation testing (strong)");
+                break;
+            case DEFUSE:
+                LoggingUtils.getEvoLogger().info("  - All DU Pairs");
+                break;
+            case STATEMENT:
+                LoggingUtils.getEvoLogger().info("  - Statement Coverage");
+                break;
+            case RHO:
+                LoggingUtils.getEvoLogger().info("  - Rho Coverage");
+                break;
+            case AMBIGUITY:
+                LoggingUtils.getEvoLogger().info("  - Ambiguity Coverage");
+                break;
+            case ALLDEFS:
+                LoggingUtils.getEvoLogger().info("  - All Definitions");
+                break;
+            case EXCEPTION:
+                LoggingUtils.getEvoLogger().info("  - Exception");
+                break;
+            case ONLYBRANCH:
+                LoggingUtils.getEvoLogger().info("  - Only-Branch Coverage");
+                break;
+            case METHODTRACE:
+                LoggingUtils.getEvoLogger().info("  - Method Coverage");
+                break;
+            case METHOD:
+                LoggingUtils.getEvoLogger().info("  - Top-Level Method Coverage");
+                break;
+            case METHODNOEXCEPTION:
+                LoggingUtils.getEvoLogger().info("  - No-Exception Top-Level Method Coverage");
+                break;
+            case LINE:
+                LoggingUtils.getEvoLogger().info("  - Line Coverage");
+                break;
+            case ONLYLINE:
+                LoggingUtils.getEvoLogger().info("  - Only-Line Coverage");
+                break;
+            case OUTPUT:
+                LoggingUtils.getEvoLogger().info("  - Method-Output Coverage");
+                break;
+            case INPUT:
+                LoggingUtils.getEvoLogger().info("  - Method-Input Coverage");
+                break;
+            case BRANCH:
+                LoggingUtils.getEvoLogger().info("  - Branch Coverage");
+                break;
+            case CBRANCH:
+                LoggingUtils.getEvoLogger().info("  - Context Branch Coverage");
+                break;
+            case IBRANCH:
+                LoggingUtils.getEvoLogger().info("  - Interprocedural Context Branch Coverage");
+                break;
+            case TRYCATCH:
+                LoggingUtils.getEvoLogger().info("  - Try-Catch Branch Coverage");
+                break;
+            case VDDU:
+                LoggingUtils.getEvoLogger().info("  - VDDU Method Coverage");
+                break;
+            case VMDDU:
+                LoggingUtils.getEvoLogger().info("  - VMDDU Method Coverage");
+                break;
+            case VCDDU:
+                LoggingUtils.getEvoLogger().info("  - VCDDU Method Coverage");
+                break;
+            case VCMDDU1:
+                LoggingUtils.getEvoLogger().info("  - VCMDDU1 Method Coverage");
+                break;
+            case VCMDDU2:
+                LoggingUtils.getEvoLogger().info("  - VCMDDU2 Method Coverage");
+                break;
+            case VRDDU:
+                LoggingUtils.getEvoLogger().info("  - VRDDU Method Coverage");
+                break;
+            case DDU_METHOD:
+                LoggingUtils.getEvoLogger().info("  - DDU Method Coverage");
+                break;
+            case DDU_METHOD_DTR:
+                LoggingUtils.getEvoLogger().info("  - DDU Method (DTR) Coverage");
+                break;
+            case DDU_PUBLIC_METHOD:
+                LoggingUtils.getEvoLogger().info("  - DDU Public Method Coverage");
+                break;
+            case DDU_PUBLIC_METHOD_DTR:
+                LoggingUtils.getEvoLogger().info("  - DDU Public Method (DTR) Coverage");
+                break;
+            case DDU_BRANCH:
+                LoggingUtils.getEvoLogger().info("  - DDU Branch Coverage");
+                break;
+            case DDU_BRANCH_DTR:
+                LoggingUtils.getEvoLogger().info("  - DDU Branch Coverage");
+                break;
+            default:
+                throw new IllegalArgumentException("Unrecognized criterion: " + criterion);
+        }
     }
-  }
 
-  private static int getBytecodeCount(RuntimeVariable v, Map<RuntimeVariable, Set<Integer>> m) {
-    Set<Integer> branchSet = m.get(v);
-    return (branchSet == null) ? 0 : branchSet.size();
-  }
+    private static int getBytecodeCount(RuntimeVariable v, Map<RuntimeVariable, Set<Integer>> m) {
+        Set<Integer> branchSet = m.get(v);
+        return (branchSet == null) ? 0 : branchSet.size();
+    }
 
     static void getBytecodeStatistics() {
         if (Properties.TRACK_BOOLEAN_BRANCHES) {

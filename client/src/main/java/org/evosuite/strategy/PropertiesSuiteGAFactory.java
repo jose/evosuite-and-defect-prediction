@@ -129,6 +129,9 @@ public class PropertiesSuiteGAFactory
                 if (Properties.REPLACEMENT_FUNCTION == TheReplacementFunction.FITNESSREPLACEMENT) {
                     // user has explicitly asked for this replacement function
                     ga.setReplacementFunction(new FitnessReplacementFunction<>());
+                } else {
+                    // use default
+                    ga.setReplacementFunction(new TestSuiteReplacementFunction());
                 }
                 return ga;
             }

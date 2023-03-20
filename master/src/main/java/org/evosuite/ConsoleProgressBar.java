@@ -36,16 +36,14 @@ public class ConsoleProgressBar implements Listener<ClientStateInformation> {
 
     private static final long serialVersionUID = 8930332599188240933L;
 
-	/**
-	 * <p>
-	 * startProgressBar
-	 * </p>
-	 * 
-	 */
-	public static void startProgressBar() {
-		MasterServices.getInstance().getMasterNode().addListener(new ConsoleProgressBar());
-	}
-	
+    /**
+     * <p>
+     * startProgressBar
+     * </p>
+     */
+    public static void startProgressBar() {
+        MasterServices.getInstance().getMasterNode().addListener(new ConsoleProgressBar());
+    }
 
     @Override
     public void receiveEvent(ClientStateInformation event) {
@@ -69,7 +67,7 @@ public class ConsoleProgressBar implements Listener<ClientStateInformation> {
             }
         }
 
-        bar.append(Math.min(100, percent)).append("%] [Cov:");
+        bar.append(Math.min(100, percent) + "%] [Cov:");
 
         for (int i = 0; i < 35; i++) {
             if (i < (int) (coverage * 0.35)) {
@@ -81,8 +79,7 @@ public class ConsoleProgressBar implements Listener<ClientStateInformation> {
             }
         }
 
-        bar.append(coverage).append("%]");
-
+        bar.append(coverage + "%]");
         bar.append(" [Fitness Value: ").append(fitnessValue).append("]");
 
         System.out.print("\r" + bar);
