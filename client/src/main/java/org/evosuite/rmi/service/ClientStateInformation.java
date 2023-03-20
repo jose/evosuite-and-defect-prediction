@@ -39,8 +39,6 @@ public class ClientStateInformation implements Serializable {
 
     private int iteration = 0;
 
-    private double fitnessValue = 0.0d;
-
     public ClientStateInformation(ClientState state) {
         this.state = state;
     }
@@ -51,14 +49,6 @@ public class ClientStateInformation implements Serializable {
 
     public ClientState getState() {
         return state;
-    }
-
-    public double getFitnessValue() {
-        return fitnessValue;
-    }
-
-    public void setFitnessValue(double fitnessValue) {
-        this.fitnessValue = fitnessValue;
     }
 
     public int getOverallProgress() {

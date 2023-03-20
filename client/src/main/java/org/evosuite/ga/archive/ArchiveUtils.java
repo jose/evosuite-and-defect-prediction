@@ -114,6 +114,10 @@ public final class ArchiveUtils {
                     }
                     break;
                 case AMBIGUITY:
+                    if (goal instanceof LineCoverageTestFitness) {
+                        return true;
+                    }
+                    break;
                 case VDDU:
                     if (goal instanceof MethodCoverageTestFitness || goal instanceof BranchCoverageTestFitness) {
                         return true;
