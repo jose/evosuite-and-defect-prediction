@@ -20,24 +20,15 @@
 package org.evosuite.coverage.aes;
 
 import static java.lang.Math.abs;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import com.opencsv.CSVWriter;
 import org.evosuite.testcase.execution.ExecutionResult;
 import org.evosuite.testsuite.TestSuiteChromosome;
 import org.evosuite.testsuite.TestSuiteFitnessFunction;
-import org.evosuite.utils.LoggingUtils;
 
 public abstract class AbstractAESCoverageSuiteFitness extends TestSuiteFitnessFunction {
 
 	private static final long serialVersionUID = 5184507726269266351L;
-    private static int iteration = 0;
-
     private final double THRESHOLD = 0.000001;
 
 	public static enum Metric { AES, DTR, VDDU, VMDDU, VRDDU, VCDDU, VCMDDU1, VCMDDU2 };
@@ -60,31 +51,14 @@ public abstract class AbstractAESCoverageSuiteFitness extends TestSuiteFitnessFu
 		return spectrum.basicCoverage();
 	}
 
-    public void writeDataLineByLine(String filePath, double fitnessValue)
-    {
-        File file = new File(filePath);
-        try {
-            FileWriter outputfile = new FileWriter(file, true);
-            CSVWriter writer = new CSVWriter(outputfile);
-            String[] data = { Integer.toString(iteration), Double.toString(fitnessValue) };
-            writer.writeNext(data);
-            writer.close();
-        }
-        catch (IOException e) {
-            LoggingUtils.getEvoLogger().error("File error:" + e);
-        }
-    }
-
     @Override
 	public double getFitness(TestSuiteChromosome suite) {
 		double metric_value = getMetric(suite);
 		double fitness = metricToFitness(metric_value);
+
 		updateIndividual(suite, fitness);
 		suite.setCoverage(this, metric_value);
-		if(iteration % 100 == 0) {
-            writeDataLineByLine("results.csv", fitness);
-        }
-		iteration++;
+
 		return fitness;
 	}
 
