@@ -317,7 +317,7 @@ public class Properties {
         // mu-lambda
         ONE_PLUS_LAMBDA_LAMBDA_GA, ONE_PLUS_ONE_EA, MU_PLUS_LAMBDA_EA, MU_LAMBDA_EA,
         // many-objective algorithms
-        MOSA, DYNAMOSA, LIPS, MIO,
+        MOSA, DYNAMOSA, LIPS, MIO, PREMOSA,
         // multiple-objective optimisation algorithms
         NSGAII, SPEA2
     }
@@ -1231,6 +1231,10 @@ public class Properties {
     @Parameter(key = "output_granularity", group = "Output", description = "Write all test cases for a class into a single file or to separate files.")
     public static OutputGranularity OUTPUT_GRANULARITY = OutputGranularity.MERGED;
 
+    @Parameter(key = "num_test_files", group = "Output", description = "Divide the total test cases into the number of" +
+        " test files specified (only to be used with output_granularity = MERGED).")
+    public static int NUM_TEST_FILES = 1;
+
     @Parameter(key = "max_coverage_depth", group = "Output", description = "Maximum depth in the calltree to count a branch as covered")
     public static int MAX_COVERAGE_DEPTH = -1;
 
@@ -1240,6 +1244,12 @@ public class Properties {
 
     @Parameter(key = "test_naming_strategy", group = "Output", description = "What strategy to use to derive names for tests")
     public static TestNamingStrategy TEST_NAMING_STRATEGY = TestNamingStrategy.NUMBERED;
+
+    @Parameter(key = "log_time_taken", group = "Output", description = "Log time taken to generate test case")
+    public static boolean LOG_TIME_TAKEN = false;
+
+    @Parameter(key = "log_age", group = "Output", description = "Log age of a test case")
+    public static boolean LOG_AGE = false;
 
     // ---------------------------------------------------------------
     // Sandbox
@@ -1357,6 +1367,9 @@ public class Properties {
     @Parameter(key = "archive_type", description = "Which type of archive to keep track of covered goals during search")
     public static ArchiveType ARCHIVE_TYPE = ArchiveType.COVERAGE;
 
+    @Parameter(key = "archive_all", description = "Archive all the test cases generated")
+    public static boolean ARCHIVE_ALL = false;
+
     @Parameter(key = "seed_file", description = "File storing TestGenerationResult or GeneticAlgorithm")
     public static String SEED_FILE = "";
 
@@ -1402,6 +1415,37 @@ public class Properties {
 
     @Parameter(key = "tt_scope", description = "Testability transformation")
     public static TransformationScope TT_SCOPE = TransformationScope.ALL;
+
+    @Parameter(key = "defect_prediction_level", description = "Level of defect prediction")
+    public static DefectPredictionLevel DP_LEVEL = DefectPredictionLevel.NONE;
+
+    public enum DefectPredictionLevel {
+        NONE, METHOD
+    }
+
+    @Parameter(key = "defect_prediction_dir", description = "Directory in which defect scores are stored")
+    public static String DP_DIR = "defect-predictions";
+
+    @Parameter(key = "dp_input_format", description = "Format of the method signatures")
+    public static MethodSignatureFormat DP_INPUT_FORMAT = MethodSignatureFormat.OWN_1;
+
+    public enum MethodSignatureFormat {
+        JVM, OWN_1
+    }
+
+    @Parameter(key = "iterations_without_improvement", description = "Number of iterations without improvement in " +
+        "buggy goals coverage to trigger the inclusion of non buggy goals")
+    public static int ITERATIONS_WO_IMPROVEMENT = 5;
+
+    @Parameter(key = "zero_coverage_trigger", description = "Number of iterations with zero buggy goals coverage to" +
+        " trigger the inclusion of non buggy goals")
+    public static int ZERO_COVERAGE_TRIGGER = 25;
+
+    @Parameter(key = "balance_test_cov", description = "Enable balanced test coverage of targets")
+    public static boolean BALANCE_TEST_COV = false;
+
+    @Parameter(key = "remove_covered_targets", description = "Remove covered targets from the search")
+    public static boolean REMOVE_COVERED_TARGETS = true;
 
     // ---------------------------------------------------------------
     // Contracts / Asserts:

@@ -487,4 +487,11 @@ public interface TestCase extends Iterable<Statement>, Cloneable, Listenable<Voi
      */
     String toCode(Map<Integer, Throwable> exceptions);
 
+    void setTimeTaken(long timeTaken);
+
+    long getTimeTaken();
+
+    void setAge(int age);
+
+    int getAge();
 }

@@ -176,7 +176,7 @@ public class CoverageAnalysis {
             }
 
             // Generate test suite
-            TestSuiteGenerator.writeJUnitTestsAndCreateResult(testSuite);
+            TestSuiteGenerator.writeJUnitTestsAndCreateResult(testSuite, false);
 
             StatisticsSender.executedAndThenSendIndividualToMaster(testSuite);
             ClientServices.getInstance().getClientNode().trackOutputVariable(RuntimeVariable.Total_Goals, goals);

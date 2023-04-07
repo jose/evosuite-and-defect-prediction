@@ -19,8 +19,10 @@
  */
 package org.evosuite.coverage.branch;
 
+import org.evosuite.Properties;
 import org.evosuite.TestGenerationContext;
 import org.evosuite.coverage.ControlFlowDistance;
+import org.evosuite.defectprediction.method.MethodPool;
 import org.evosuite.graphs.cfg.BytecodeInstructionPool;
 import org.evosuite.graphs.cfg.ControlDependency;
 import org.evosuite.testcase.execution.ExecutionResult;
@@ -52,6 +54,11 @@ public class BranchCoverageGoal implements Serializable, Comparable<BranchCovera
     private final boolean value;
     private final String className;
     private final String methodName;
+
+    private int numTestCasesInZeroFront = 1;
+    private double archiveProbability = 1.0;
+
+    private boolean isBuggy = false;
 
 
     /**
@@ -107,6 +114,7 @@ public class BranchCoverageGoal implements Serializable, Comparable<BranchCovera
             lineNumber = BytecodeInstructionPool.getInstance(TestGenerationContext.getInstance().getClassLoaderForSUT())
                     .getFirstLineNumberOfMethod(className, methodName);
         }
+        setBuggy(className, methodName);
     }
 
     /**
@@ -132,6 +140,8 @@ public class BranchCoverageGoal implements Serializable, Comparable<BranchCovera
         this.className = className;
         this.methodName = methodName;
         this.lineNumber = lineNumber;
+
+        setBuggy(className, methodName);
     }
 
     /**
@@ -162,6 +172,8 @@ public class BranchCoverageGoal implements Serializable, Comparable<BranchCovera
         this.methodName = methodName;
         lineNumber = BytecodeInstructionPool.getInstance(TestGenerationContext.getInstance().getClassLoaderForSUT())
                 .getFirstLineNumberOfMethod(className, methodName);
+
+        setBuggy(className, methodName);
     }
 
     /**
@@ -377,6 +389,53 @@ public class BranchCoverageGoal implements Serializable, Comparable<BranchCovera
             this.branch = BranchPool.getInstance(TestGenerationContext.getInstance().getClassLoaderForSUT()).getBranch(branchId);
         else
             this.branch = null;
+    }
+
+    public int getNumTestCasesInZeroFront() {
+        return numTestCasesInZeroFront;
+    }
+
+    private void setNumTestCasesInZeroFront(int numTestCasesInZeroFront) {
+        this.numTestCasesInZeroFront = numTestCasesInZeroFront;
+    }
+
+    private void setNumTestCasesInZeroFront(String fullClassName, String methodName) {
+        if (Properties.DP_LEVEL == Properties.DefectPredictionLevel.METHOD) {
+            String className = fullClassName;
+            if (fullClassName.contains("$")) {
+                className = fullClassName.substring(0, fullClassName.indexOf('$'));
+            }
+
+            this.setNumTestCasesInZeroFront(MethodPool.getInstance(className).calculateNumTestCasesInZeroFront(fullClassName, methodName));
+            this.setArchiveProbability(MethodPool.getInstance(className).getArchiveProbability(fullClassName, methodName));
+        }
+    }
+
+    public double getArchiveProbability() {
+        return archiveProbability;
+    }
+
+    public void setArchiveProbability(double archiveProbability) {
+        this.archiveProbability = archiveProbability;
+    }
+
+    private void setBuggy(boolean isBuggy) {
+        this.isBuggy = isBuggy;
+    }
+
+    public boolean isBuggy() {
+        return this.isBuggy;
+    }
+
+    private void setBuggy(String fullClassName, String methodName) {
+        if (Properties.DP_LEVEL == Properties.DefectPredictionLevel.METHOD) {
+            String className = fullClassName;
+            if (fullClassName.contains("$")) {
+                className = fullClassName.substring(0, fullClassName.indexOf('$'));
+            }
+
+            this.setBuggy(MethodPool.getInstance(className).isBuggy(fullClassName, methodName));
+        }
     }
 
 }

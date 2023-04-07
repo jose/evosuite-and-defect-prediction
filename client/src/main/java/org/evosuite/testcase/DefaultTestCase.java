@@ -88,6 +88,10 @@ public class DefaultTestCase implements TestCase, Serializable {
 
     private int id;
 
+    private long timeTaken;
+
+    private int age;
+
     /**
      * Constructs an empty test case, i.e., initially containing no statements.
      */
@@ -1199,10 +1203,29 @@ public class DefaultTestCase implements TestCase, Serializable {
         }
     }
 
+    @Override
+    public void setTimeTaken(long timeTaken) {
+        this.timeTaken = timeTaken;
+    }
+
+    @Override
+    public long getTimeTaken() {
+        return this.timeTaken;
+    }
+
+    @Override
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public int getAge() {
+        return this.age;
+    }
+
     /* (non-Javadoc)
      * @see org.evosuite.testcase.TestCase#replace(org.evosuite.testcase.VariableReference, org.evosuite.testcase.VariableReference)
      */
-
     /**
      * {@inheritDoc}
      */

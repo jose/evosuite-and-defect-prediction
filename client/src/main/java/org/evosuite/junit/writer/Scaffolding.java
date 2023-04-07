@@ -72,11 +72,17 @@ public class Scaffolding {
      * @return
      */
     public static String getScaffoldingFileContent(String testName, List<ExecutionResult> results,
-                                                   boolean wasSecurityException) {
+                                                   boolean wasSecurityException, boolean writeToDisk) {
 
         String name = getFileName(testName);
 
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = null;
+
+        if (writeToDisk) {
+            builder = new StringBuilder(5120);
+        } else {
+            builder = new StringBuilder(1024);
+        }
 
         builder.append(getHeader(name, results, wasSecurityException));
         if (results.isEmpty()) {
