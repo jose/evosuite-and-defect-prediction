@@ -54,6 +54,9 @@ public class DynaMOSA extends AbstractMOSA {
 
     protected CrowdingDistance<TestChromosome> distance = new CrowdingDistance<>();
 
+    /** Total time taken to adjust the goals (switch on/off goals) in nano seconds */
+    protected long adjustGoalsOH = 0;
+
     /**
      * Constructor based on the abstract class {@link AbstractMOSA}.
      *
@@ -79,6 +82,15 @@ public class DynaMOSA extends AbstractMOSA {
         // Ranking the union
         logger.debug("Union Size = {}", union.size());
 
+        if (Properties.BALANCE_TEST_COV) {
+            // Switch off targets to balance test coverage
+            long adjustGoalsStartTime = System.nanoTime();
+            adjustCurrentGoals();
+            long adjustGoalEndTime = System.nanoTime();
+
+            this.adjustGoalsOH += adjustGoalEndTime - adjustGoalsStartTime;
+        }
+
         // Ranking the union using the best rank algorithm (modified version of the non dominated
         // sorting algorithm)
         this.rankingFunction.computeRankingAssignment(union, this.goalsManager.getCurrentGoals());
@@ -91,6 +103,11 @@ public class DynaMOSA extends AbstractMOSA {
 
         // Obtain the first front
         List<TestChromosome> front = this.rankingFunction.getSubfront(index);
+
+        if (front.isEmpty()) {
+            index++;
+            front = this.rankingFunction.getSubfront(index);
+        }
 
         // Successively iterate through the fronts (starting with the first non-dominated front)
         // and insert their members into the population for the next generation. This is done until
@@ -135,6 +152,43 @@ public class DynaMOSA extends AbstractMOSA {
     }
 
     /**
+     * Switch on/off current goals to balance test coverage among goals based on number of tests per an independent
+     * path of each goal
+     */
+    protected void adjustCurrentGoals() {
+        for (int actualBranchId : this.goalsManager.getBranchCoverageTrueMap().keySet()) {
+            FitnessFunction ffTrue = this.goalsManager.getBranchCoverageTrueMap().get(actualBranchId);
+            FitnessFunction ffFalse = this.goalsManager.getBranchCoverageFalseMap().get(actualBranchId);
+
+            int numTestsTrueBranch = this.goalsManager.getNumTests(ffTrue.toString());
+            int numTestsFalseBranch = this.goalsManager.getNumTests(ffFalse.toString());
+
+            logger.debug("Branch: {}, Number of Tests: {}, Num of Paths: {}", ffTrue.toString(), numTestsTrueBranch,
+                this.goalsManager.getNumPathsFor(ffTrue));
+            logger.debug("Branch: {}, Number of Tests: {}, Num of Paths: {}", ffFalse.toString(), numTestsFalseBranch,
+                this.goalsManager.getNumPathsFor(ffFalse));
+
+            if (numTestsTrueBranch == 0 && numTestsFalseBranch == 0) {
+                continue;
+            }
+
+            int numPathsTrueBranch = this.goalsManager.getNumPathsFor(ffTrue);
+            int numPathsFalseBranch = this.goalsManager.getNumPathsFor(ffFalse);
+
+            double testsPerPathTrueB = (double) numTestsTrueBranch / numPathsTrueBranch;
+            double testsPerPathFalseB = (double) numTestsFalseBranch / numPathsFalseBranch;
+
+            if (Double.compare(testsPerPathTrueB, testsPerPathFalseB) > 0) {
+                this.goalsManager.getCurrentGoals().remove(ffTrue);
+                this.goalsManager.getCurrentGoals().add(ffFalse);
+            } else if (Double.compare(testsPerPathTrueB, testsPerPathFalseB) < 0) {
+                this.goalsManager.getCurrentGoals().remove(ffFalse);
+                this.goalsManager.getCurrentGoals().add(ffTrue);
+            }
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -169,9 +223,13 @@ public class DynaMOSA extends AbstractMOSA {
 
         // Evolve the population generation by generation until all gaols have been covered or the
         // search budget has been consumed.
-        while (!isFinished() && this.goalsManager.getUncoveredGoals().size() > 0) {
+        while (!isFinished() /*&& this.goalsManager.getUncoveredGoals().size() > 0*/) { // second condition is handled by stop_zero option
             this.evolve();
             this.notifyIteration();
+        }
+
+        if (Properties.BALANCE_TEST_COV) {
+            LoggingUtils.getEvoLogger().info("* Adjust Goals Overhead: {} ms", (double) (this.adjustGoalsOH) / 1000000);
         }
 
         this.notifySearchFinished();
