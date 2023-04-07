@@ -20,6 +20,7 @@
 package org.evosuite.coverage.method;
 
 import org.evosuite.Properties;
+import org.evosuite.defectprediction.method.MethodPool;
 import org.evosuite.ga.archive.Archive;
 import org.evosuite.testcase.TestChromosome;
 import org.evosuite.testcase.TestFitnessFunction;
@@ -49,6 +50,8 @@ public class MethodCoverageTestFitness extends TestFitnessFunction {
     protected final String className;
     protected final String methodName;
 
+    private boolean buggy = true;
+
     /**
      * Constructor - fitness is specific to a method
      *
@@ -58,6 +61,12 @@ public class MethodCoverageTestFitness extends TestFitnessFunction {
     public MethodCoverageTestFitness(String className, String methodName) {
         this.className = Objects.requireNonNull(className, "className cannot be null");
         this.methodName = Objects.requireNonNull(methodName, "methodName cannot be null");
+    }
+
+    private void checkIfBuggy() {
+        if (Properties.DP_LEVEL == Properties.DefectPredictionLevel.METHOD) {
+            this.setBuggy(MethodPool.getInstance(className).isBuggy(className, methodName));
+        }
     }
 
     /**
@@ -206,4 +215,11 @@ public class MethodCoverageTestFitness extends TestFitnessFunction {
         return getMethod();
     }
 
+    public boolean isBuggy() {
+        return buggy;
+    }
+
+    public void setBuggy(boolean buggy) {
+        this.buggy = buggy;
+    }
 }

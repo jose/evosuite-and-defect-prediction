@@ -98,7 +98,7 @@ public class BreederGA<T extends Chromosome<T>> extends StandardGA<T> {
             offspring.mutate();
 
             if (offspring.isChanged()) {
-                offspring.updateAge(currentIteration);
+                offspring.updateAge(currentIteration, this.getCurrentTime());
             }
             if (!isTooLong(offspring)) {
                 newGeneration.add(offspring1);

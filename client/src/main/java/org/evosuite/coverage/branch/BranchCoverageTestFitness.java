@@ -248,4 +248,15 @@ public class BranchCoverageTestFitness extends TestFitnessFunction {
         return getMethod();
     }
 
+    public int getNumTestCasesInZeroFront() {
+        return goal.getNumTestCasesInZeroFront();
+    }
+
+    public double getArchiveProbability() {
+        return goal.getArchiveProbability();
+    }
+
+    public boolean isBuggy() {
+        return goal.isBuggy();
+    }
 }

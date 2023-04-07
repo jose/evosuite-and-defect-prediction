@@ -120,10 +120,10 @@ public class NoveltySearch extends GeneticAlgorithm<TestChromosome> {
                 offspring2.mutate();
 
                 if (offspring1.isChanged()) {
-                    offspring1.updateAge(currentIteration);
+                    offspring1.updateAge(currentIteration, this.getCurrentTime());
                 }
                 if (offspring2.isChanged()) {
-                    offspring2.updateAge(currentIteration);
+                    offspring2.updateAge(currentIteration, this.getCurrentTime());
                 }
             } catch (ConstructionFailedException e) {
                 logger.info("CrossOver/Mutation failed.");
