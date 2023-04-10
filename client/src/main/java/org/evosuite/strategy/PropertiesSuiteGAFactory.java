@@ -34,6 +34,7 @@ import org.evosuite.ga.metaheuristics.*;
 import org.evosuite.ga.metaheuristics.mosa.DynaMOSA;
 import org.evosuite.ga.metaheuristics.mosa.MOSA;
 import org.evosuite.ga.metaheuristics.mosa.MOSATestSuiteAdapter;
+import org.evosuite.ga.metaheuristics.mosa.PreMOSA;
 import org.evosuite.ga.metaheuristics.mulambda.MuLambdaEA;
 import org.evosuite.ga.metaheuristics.mulambda.MuPlusLambdaEA;
 import org.evosuite.ga.metaheuristics.mulambda.OnePlusLambdaLambdaGA;
@@ -186,6 +187,10 @@ public class PropertiesSuiteGAFactory
             case DYNAMOSA:
                 logger.info("Chosen search algorithm: DynaMOSA");
 //				return new DynaMOSA(factory);
+                if (Properties.BALANCE_TEST_COV) {
+                    // Balanced test coverage is only used when covered targets are not removed from the search
+                    Properties.REMOVE_COVERED_TARGETS = false;
+                }
                 if (factory instanceof TestSuiteChromosomeFactory) {
                     final TestSuiteChromosomeFactory tscf = (TestSuiteChromosomeFactory) factory;
                     return new MOSATestSuiteAdapter(new DynaMOSA(tscf.getTestChromosomeFactory()));
@@ -194,6 +199,17 @@ public class PropertiesSuiteGAFactory
                     logger.info("Using a default factory that creates tests with variable length");
                     return new MOSATestSuiteAdapter(new DynaMOSA(new RandomLengthTestFactory()));
                 }
+            case PREMOSA:
+                logger.info("Chosen search algorithm: PreMOSA");
+                // PreMOSA does not remove covered targets from the search by default
+                Properties.REMOVE_COVERED_TARGETS = false;
+                // PreMOSA does not stop after all the goals/targets are covered
+                Properties.STOP_ZERO = false;
+                // PreMOSA archives all the test cases by default
+                Properties.ARCHIVE_ALL = true;
+//                return new PreMOSA<TestSuiteChromosome>(factory);
+                final TestSuiteChromosomeFactory scf = (TestSuiteChromosomeFactory) factory;
+                return new MOSATestSuiteAdapter(new PreMOSA(scf.getTestChromosomeFactory()));
             case ONE_PLUS_LAMBDA_LAMBDA_GA:
                 logger.info("Chosen search algorithm: 1 + (lambda, lambda)GA");
                 return new OnePlusLambdaLambdaGA<>(factory, Properties.LAMBDA);

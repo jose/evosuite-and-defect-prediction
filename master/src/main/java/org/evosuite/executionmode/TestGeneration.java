@@ -309,6 +309,8 @@ public class TestGeneration {
         cmdLine.add("-XX:MaxJavaStackTraceDepth=1000000");
         cmdLine.add("-XX:+StartAttachListener");
 
+        cmdLine.add("-XX:+UseCompressedOops");
+
         for (String arg : args) {
             if (!arg.startsWith("-DCP=")) {
                 cmdLine.add(arg);

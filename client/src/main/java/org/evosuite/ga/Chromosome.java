@@ -533,6 +533,14 @@ public abstract class Chromosome<T extends Chromosome<T>>
         this.timeTaken = currentTime;
     }
 
+    protected void updateTimeTaken() {
+        return;
+    }
+
+    protected void updateAgeInTestCase() {
+        return;
+    }
+
     public int getAge() {
         return age;
     }

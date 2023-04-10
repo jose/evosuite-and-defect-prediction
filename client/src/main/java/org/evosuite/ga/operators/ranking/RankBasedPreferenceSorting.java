@@ -127,15 +127,23 @@ public class RankBasedPreferenceSorting<T extends Chromosome<T>> implements Rank
 
             T best = null;
             for (T test : solutionSet) {
+                if (Double.compare(test.getFitness(f), 0.0) == 0) {
+                    continue;
+                }
+
                 int flag = comp.compare(test, best);
                 if (flag < 0 || (flag == 0 && Randomness.nextBoolean())) {
                     best = test;
                 }
             }
-            assert best != null;
+//            assert best != null;
 
-            best.setRank(0);
-            zero_front.add(best);
+            if (best != null) {
+                best.setRank(0);
+                zero_front.add(best);
+            } else {
+                logger.error("Best is null!");
+            }
         }
         return new ArrayList<>(zero_front);
     }

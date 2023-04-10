@@ -25,13 +25,16 @@ import org.evosuite.coverage.branch.BranchCoverageTestFitness;
 import org.evosuite.graphs.cfg.ActualControlFlowGraph;
 import org.evosuite.graphs.cfg.BasicBlock;
 import org.evosuite.graphs.cfg.BytecodeInstruction;
+import org.evosuite.graphs.cfg.ControlDependency;
 import org.evosuite.testcase.TestFitnessFunction;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
@@ -66,26 +69,90 @@ public class BranchFitnessGraph implements Serializable {
                 this.rootBranches.add(fitness);
             // see dependencies for all true/false branches
             ActualControlFlowGraph rcfg = branch.getInstruction().getActualCFG();
-            Set<BasicBlock> visitedBlock = new HashSet<>();
-            Set<BasicBlock> parents = lookForParent(branch.getInstruction().getBasicBlock(), rcfg, visitedBlock);
-            for (BasicBlock bb : parents) {
-                Branch newB = extractBranch(bb);
-                if (newB == null) {
+//            Set<BasicBlock> visitedBlock = new HashSet<>();
+//            Set<BasicBlock> parents = lookForParent(branch.getInstruction().getBasicBlock(), rcfg, visitedBlock);
+//            for (BasicBlock bb : parents) {
+//                Branch newB = extractBranch(bb);
+//                if (newB == null) {
+//                    this.rootBranches.add(fitness);
+//                    continue;
+//                }
+//
+//                BranchCoverageGoal goal = new BranchCoverageGoal(newB, true, newB.getClassName(), newB.getMethodName());
+//                BranchCoverageTestFitness newFitness = new BranchCoverageTestFitness(goal);
+//                graph.addEdge(newFitness, fitness);
+//
+//                BranchCoverageGoal goal2 = new BranchCoverageGoal(newB, false, newB.getClassName(), newB.getMethodName());
+//                BranchCoverageTestFitness newfitness2 = new BranchCoverageTestFitness(goal2);
+//                graph.addEdge(newfitness2, fitness);
+//            }
+
+            Set<Map.Entry<BasicBlock, ControlDependency>> visitedBlocks = new HashSet<>();
+            Set<Map.Entry<BasicBlock, ControlDependency>> parents =
+                lookForParentWithCd(branch.getInstruction().getBasicBlock(), rcfg, visitedBlocks);
+
+            for (Map.Entry<BasicBlock, ControlDependency> bbCdPair : parents){
+                Branch newB = extractBranch(bbCdPair.getKey());
+                if (newB == null){
                     this.rootBranches.add(fitness);
                     continue;
                 }
 
-                BranchCoverageGoal goal = new BranchCoverageGoal(newB, true, newB.getClassName(), newB.getMethodName());
-                BranchCoverageTestFitness newFitness = new BranchCoverageTestFitness(goal);
-                graph.addEdge(newFitness, fitness);
-
-                BranchCoverageGoal goal2 = new BranchCoverageGoal(newB, false, newB.getClassName(), newB.getMethodName());
-                BranchCoverageTestFitness newfitness2 = new BranchCoverageTestFitness(goal2);
-                graph.addEdge(newfitness2, fitness);
+                if (bbCdPair.getValue() != null) {
+                    BranchCoverageGoal goal = new BranchCoverageGoal(newB,
+                        bbCdPair.getValue().getBranchExpressionValue(), newB.getClassName(), newB.getMethodName());
+                    BranchCoverageTestFitness newFitness = new BranchCoverageTestFitness(goal);
+                    graph.addEdge((TestFitnessFunction) newFitness, fitness);
+                } else {
+                    logger.error("No Control Dependency for Branch: {}", newB.toString());
+                }
             }
         }
     }
 
+    public Set<Map.Entry<BasicBlock, ControlDependency>> lookForParentWithCd(BasicBlock block,
+                                                                             ActualControlFlowGraph acfg,
+                                                                             Set<Map.Entry<BasicBlock, ControlDependency>>
+                                                                                 visitedBlocks){
+        Set<Map.Entry<BasicBlock, ControlDependency>> realParents = new HashSet<>();
+        Set<Map.Entry<BasicBlock, ControlDependency>> parents = acfg.getParentsWithCd(block);
+        if (parents.size() == 0){
+            realParents.add(new AbstractMap.SimpleEntry(block, null));
+            return realParents;
+        }
+        for (Map.Entry<BasicBlock, ControlDependency> bbCdPair : parents){
+            if (contains(bbCdPair, visitedBlocks)) {
+                continue;
+            }
+            visitedBlocks.add(bbCdPair);
+            if (containsBranches(bbCdPair.getKey())) {
+                realParents.add(bbCdPair);
+            } else {
+                realParents.addAll(lookForParentWithCd(bbCdPair.getKey(), acfg, visitedBlocks));
+            }
+        }
+        return realParents;
+    }
+
+    private boolean contains(Map.Entry<BasicBlock, ControlDependency> bbCdPair,
+                             Set<Map.Entry<BasicBlock, ControlDependency>> visitedBlocks) {
+
+        if (bbCdPair.getValue() == null) {
+            for (Map.Entry<BasicBlock, ControlDependency> visitedPair : visitedBlocks) {
+                if (visitedPair.getKey().equals(bbCdPair.getKey()) && visitedPair.getValue() == null) {
+                    return true;
+                }
+            }
+        } else {
+            for (Map.Entry<BasicBlock, ControlDependency> visitedPair : visitedBlocks) {
+                if (visitedPair.getKey().equals(bbCdPair.getKey()) && bbCdPair.getValue().equals(visitedPair.getValue())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
     public Set<BasicBlock> lookForParent(BasicBlock block, ActualControlFlowGraph acfg, Set<BasicBlock> visitedBlock) {
         Set<BasicBlock> realParent = new HashSet<>();
@@ -148,5 +215,34 @@ public class BranchFitnessGraph implements Serializable {
         return this.graph.incomingEdgesOf(parent).stream()
                 .map(DependencyEdge::getSource)
                 .collect(toSet());
+    }
+
+    public Set<TestFitnessFunction> getAllStructuralChildren(TestFitnessFunction parent,
+                                                            Map<TestFitnessFunction, Set<TestFitnessFunction>> children,
+                                                            Set<TestFitnessFunction> allParents) {
+        Set<TestFitnessFunction> allParentsOfThisBranch = new HashSet<>();
+        allParentsOfThisBranch.addAll(allParents);
+
+        Set<TestFitnessFunction> allChildren = new HashSet<>();
+
+        Set<TestFitnessFunction> immediateChildren = getStructuralChildren(parent);
+        allParentsOfThisBranch.add(parent);
+
+        for (TestFitnessFunction immediateChild :  immediateChildren) {
+            if (allParentsOfThisBranch.contains(immediateChild)) {
+                continue;
+            }
+
+            allChildren.add(immediateChild);
+
+            if (children.containsKey(immediateChild)) {
+                allChildren.addAll(children.get(immediateChild));
+            } else {
+                allChildren.addAll(getAllStructuralChildren(immediateChild, children, allParentsOfThisBranch));
+            }
+        }
+
+        children.putIfAbsent(parent, allChildren);
+        return allChildren;
     }
 }

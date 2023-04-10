@@ -157,8 +157,8 @@ public class DynaMOSA extends AbstractMOSA {
      */
     protected void adjustCurrentGoals() {
         for (int actualBranchId : this.goalsManager.getBranchCoverageTrueMap().keySet()) {
-            FitnessFunction ffTrue = this.goalsManager.getBranchCoverageTrueMap().get(actualBranchId);
-            FitnessFunction ffFalse = this.goalsManager.getBranchCoverageFalseMap().get(actualBranchId);
+            TestFitnessFunction ffTrue = this.goalsManager.getBranchCoverageTrueMap().get(actualBranchId);
+            TestFitnessFunction ffFalse = this.goalsManager.getBranchCoverageFalseMap().get(actualBranchId);
 
             int numTestsTrueBranch = this.goalsManager.getNumTests(ffTrue.toString());
             int numTestsFalseBranch = this.goalsManager.getNumTests(ffFalse.toString());

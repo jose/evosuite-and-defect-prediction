@@ -136,6 +136,16 @@ public final class TestChromosome extends AbstractTestChromosome<TestChromosome>
         return c;
     }
 
+    @Override
+    protected void updateTimeTaken() {
+        test.setTimeTaken(this.timeTaken);
+    }
+
+    @Override
+    protected void updateAgeInTestCase() {
+        test.setAge(this.age);
+    }
+
 
     /* (non-Javadoc)
      * @see org.evosuite.testcase.ExecutableChromosome#copyCachedResults(org.evosuite.testcase.ExecutableChromosome)

@@ -50,7 +50,7 @@ public class StructuredTestCodeVisitor extends TestCodeVisitor {
     @Override
     protected void visitAssertion(Assertion assertion) {
         if (!checkAdded && assertion.getStatement().getPosition() == checkingPosition) {
-            testCode += "\n// Check\n";
+            testCodeBuilder.append("\n// Check\n");
             checkAdded = true;
         }
 
@@ -77,14 +77,14 @@ public class StructuredTestCodeVisitor extends TestCodeVisitor {
     public void visitStatement(Statement statement) {
         int position = statement.getPosition();
         if (position == exercisePosition)
-            testCode += "\n// Exercise\n";
+            testCodeBuilder.append("\n// Exercise\n");
         else if (position == 0)
-            testCode += "// Setup\n";
+            testCodeBuilder.append("// Setup\n");
 
         super.visitStatement(statement);
         if (position == checkingPosition) {
             if (!checkAdded && !statement.hasAssertions()) {
-                testCode += "\n// Check\n";
+                testCodeBuilder.append("\n// Check\n");
                 checkAdded = true;
             }
         }

@@ -22,6 +22,7 @@ package org.evosuite.ga.metaheuristics.mosa.structural;
 import org.evosuite.Properties;
 import org.evosuite.Properties.Criterion;
 import org.evosuite.TestGenerationContext;
+import org.evosuite.coverage.branch.Branch;
 import org.evosuite.coverage.branch.BranchCoverageFactory;
 import org.evosuite.coverage.branch.BranchCoverageGoal;
 import org.evosuite.coverage.branch.BranchCoverageTestFitness;
@@ -73,6 +74,11 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
 
     protected Map<BranchCoverageTestFitness, Set<TestFitnessFunction>> dependencies;
 
+    protected final Map<TestFitnessFunction, Integer> numPaths = new LinkedHashMap<>();
+
+    /** Children of each target (goal) */
+    protected final Map<TestFitnessFunction, Set<TestFitnessFunction>> children = new LinkedHashMap<>();
+
     /**
      * Maps branch IDs to the corresponding fitness function, only considering branches we want to
      * take.
@@ -89,7 +95,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
      * Maps branch IDs to the corresponding fitness function, only considering root branches of
      * methods (i.e. the goal is to just invoke the method).
      */
-    private final Map<String, TestFitnessFunction> branchlessMethodCoverageMap = new LinkedHashMap<>();
+    protected final Map<String, TestFitnessFunction> branchlessMethodCoverageMap = new LinkedHashMap<>();
 
     /**
      * Creates a new {@code MultiCriteriaManager} with the given list of targets. The targets are
@@ -101,7 +107,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
         super(targets);
 
         // initialize the dependency graph among branches
-        this.graph = getControlDependencies4Branches(targets);
+        this.graph = getControlDependencies4Branches();
 
         // initialize the dependency graph between branches and other coverage targets (e.g., statements)
         // let's derive the dependency graph between branches and other coverage targets (e.g., statements)
@@ -148,9 +154,61 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
 
         // initialize current goals
         this.currentGoals.addAll(graph.getRootBranches());
+
+        if (Properties.BALANCE_TEST_COV) {
+            // Calculate number of independent paths leading up from each target (goal)
+            calculateIndependentPaths(targets);
+        }
     }
 
-    private void addDependencies4TryCatch() {
+    protected void calculateIndependentPaths(List<TestFitnessFunction> fitnessFunctions) {
+        long pathsCalculationStartTime = System.nanoTime();
+        for (TestFitnessFunction rootBranch : graph.getRootBranches()) {
+            Set<TestFitnessFunction> allParents = new HashSet<>();
+            graph.getAllStructuralChildren(rootBranch, this.children, allParents);
+        }
+
+        for (TestFitnessFunction ff : fitnessFunctions) {
+            if (ff instanceof BranchCoverageTestFitness) {
+                if (!this.children.containsKey(ff)) {
+                    logger.error("Children not found for {}", ff.toString());
+                    Set<TestFitnessFunction> allParents = new HashSet<>();
+                    graph.getAllStructuralChildren(ff, this.children, allParents);
+                }
+
+                this.numPaths.put(ff, calculateNumPaths(this.children.get(ff)));
+            }
+        }
+        long pathsCalculationEndTime = System.nanoTime();
+        LoggingUtils.getEvoLogger().info("* Paths Calculation Overhead: {} ms",
+            (double) (pathsCalculationEndTime - pathsCalculationStartTime) / 1000000);
+    }
+
+    private Integer calculateNumPaths(Set<TestFitnessFunction> childrenOf) {
+        Map<Branch, Integer> numChildren = new HashMap<>();
+        Set<Branch> cdNodes = new HashSet<>();
+
+        for (TestFitnessFunction ff : childrenOf) {
+            Branch branch = ((BranchCoverageTestFitness) ff).getBranch();
+            if (numChildren.containsKey(branch)) {
+                int numChildrenForB = numChildren.get(branch);
+                numChildrenForB++;
+                numChildren.put(branch, numChildrenForB);
+
+                if (numChildrenForB == 2) {
+                    cdNodes.add(branch);
+                } else if (numChildrenForB > 2) {
+                    logger.error("Unexpected number of children for {}", branch.toString());
+                }
+            } else {
+                numChildren.put(branch, 1);
+            }
+        }
+
+        return cdNodes.size() + 1;
+    }
+
+    protected void addDependencies4TryCatch() {
         logger.debug("Added dependencies for Try-Catch");
         for (FitnessFunction<TestChromosome> ff : this.getUncoveredGoals()) {
             if (ff instanceof TryCatchCoverageTestFitness) {
@@ -161,7 +219,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
         }
     }
 
-    private void initializeMaps(Set<TestFitnessFunction> set) {
+    protected void initializeMaps(Set<TestFitnessFunction> set) {
         for (TestFitnessFunction ff : set) {
             BranchCoverageTestFitness goal = (BranchCoverageTestFitness) ff;
 
@@ -180,7 +238,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
         }
     }
 
-    private void addDependencies4Output() {
+    protected void addDependencies4Output() {
         logger.debug("Added dependencies for Output");
         for (TestFitnessFunction ff : this.getUncoveredGoals()) {
             if (ff instanceof OutputCoverageTestFitness) {
@@ -212,7 +270,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
      * This methods derive the dependencies between {@link InputCoverageTestFitness} and branches.
      * Therefore, it is used to update 'this.dependencies'
      */
-    private void addDependencies4Input() {
+    protected void addDependencies4Input() {
         logger.debug("Added dependencies for Input");
         for (TestFitnessFunction ff : this.getUncoveredGoals()) {
             if (ff instanceof InputCoverageTestFitness) {
@@ -244,7 +302,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
      * This methods derive the dependencies between {@link MethodCoverageTestFitness} and branches.
      * Therefore, it is used to update 'this.dependencies'
      */
-    private void addDependencies4Methods() {
+    protected void addDependencies4Methods() {
         logger.debug("Added dependencies for Methods");
         for (BranchCoverageTestFitness branch : this.dependencies.keySet()) {
             MethodCoverageTestFitness method = new MethodCoverageTestFitness(branch.getClassName(), branch.getMethod());
@@ -256,7 +314,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
      * This methods derive the dependencies between {@link MethodNoExceptionCoverageTestFitness} and branches.
      * Therefore, it is used to update 'this.dependencies'
      */
-    private void addDependencies4MethodsNoException() {
+    protected void addDependencies4MethodsNoException() {
         logger.debug("Added dependencies for MethodsNoException");
         for (BranchCoverageTestFitness branch : this.dependencies.keySet()) {
             MethodNoExceptionCoverageTestFitness method = new MethodNoExceptionCoverageTestFitness(branch.getClassName(), branch.getMethod());
@@ -268,7 +326,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
      * This methods derive the dependencies between {@link CBranchTestFitness} and branches.
      * Therefore, it is used to update 'this.dependencies'
      */
-    private void addDependencies4CBranch() {
+    protected void addDependencies4CBranch() {
         logger.debug("Added dependencies for CBranch");
         CallGraph callGraph = DependencyAnalysis.getCallGraph();
         for (BranchCoverageTestFitness branch : this.dependencies.keySet()) {
@@ -284,7 +342,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
      * This methods derive the dependencies between {@link WeakMutationTestFitness} and branches.
      * Therefore, it is used to update 'this.dependencies'
      */
-    private void addDependencies4WeakMutation() {
+    protected void addDependencies4WeakMutation() {
         logger.debug("Added dependencies for Weak-Mutation");
         for (TestFitnessFunction ff : this.getUncoveredGoals()) {
             if (ff instanceof WeakMutationTestFitness) {
@@ -306,7 +364,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
      * This methods derive the dependencies between {@link org.evosuite.coverage.mutation.StrongMutationTestFitness} and branches.
      * Therefore, it is used to update 'this.dependencies'
      */
-    private void addDependencies4StrongMutation() {
+    protected void addDependencies4StrongMutation() {
         logger.debug("Added dependencies for Strong-Mutation");
         for (TestFitnessFunction ff : this.getUncoveredGoals()) {
             if (ff instanceof StrongMutationTestFitness) {
@@ -328,7 +386,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
      * This methods derive the dependencies between  {@link LineCoverageTestFitness} and branches.
      * Therefore, it is used to update 'this.dependencies'
      */
-    private void addDependencies4Line() {
+    protected void addDependencies4Line() {
         logger.debug("Added dependencies for Lines");
         for (TestFitnessFunction ff : this.getUncoveredGoals()) {
             if (ff instanceof LineCoverageTestFitness) {
@@ -353,7 +411,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
      * This methods derive the dependencies between  {@link StatementCoverageTestFitness} and branches.
      * Therefore, it is used to update 'this.dependencies'
      */
-    private void addDependencies4Statement() {
+    protected void addDependencies4Statement() {
         logger.debug("Added dependencies for Statements");
         for (TestFitnessFunction ff : this.getUncoveredGoals()) {
             if (ff instanceof StatementCoverageTestFitness) {
@@ -444,7 +502,9 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
         }
 
         // Removes all newly covered goals from the list of currently uncovered goals.
-        currentGoals.removeAll(this.getCoveredGoals());
+        if (Properties.REMOVE_COVERED_TARGETS) {
+            currentGoals.removeAll(this.getCoveredGoals());
+        }
 
         // 2) We update the archive.
         final ExecutionTrace trace = result.getTrace();
@@ -528,7 +588,7 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
         return covered_exceptions;
     }
 
-    public BranchFitnessGraph getControlDependencies4Branches(List<TestFitnessFunction> fitnessFunctions) {
+    public BranchFitnessGraph getControlDependencies4Branches() {
         Set<TestFitnessFunction> setOfBranches = new LinkedHashSet<>();
         this.dependencies = new LinkedHashMap<>();
 
@@ -542,5 +602,17 @@ public class MultiCriteriaManager extends StructuralGoalManager implements Seria
         this.initializeMaps(setOfBranches);
 
         return new BranchFitnessGraph(setOfBranches);
+    }
+
+    public int getNumPathsFor(TestFitnessFunction ff) {
+        return this.numPaths.get(ff);
+    }
+
+    public Map<Integer, TestFitnessFunction> getBranchCoverageTrueMap() {
+        return branchCoverageTrueMap;
+    }
+
+    public Map<Integer, TestFitnessFunction> getBranchCoverageFalseMap() {
+        return branchCoverageFalseMap;
     }
 }
