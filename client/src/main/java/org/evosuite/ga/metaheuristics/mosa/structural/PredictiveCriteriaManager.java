@@ -61,22 +61,22 @@ public class PredictiveCriteriaManager extends MultiCriteriaManager {
         for (TestFitnessFunction ff : targets) {
             if (ff instanceof BranchCoverageTestFitness) {
                 if (((BranchCoverageTestFitness) ff).isBuggy()) {
-                    uncoveredGoals.add(ff);
+                    getUncoveredGoals().add(ff);
                 } else {
                     nonBuggyGoals.add(ff);
                 }
             } else if (ff instanceof MethodCoverageTestFitness) {
                 if (((MethodCoverageTestFitness) ff).isBuggy()) {
-                    uncoveredGoals.add(ff);
+                    getUncoveredGoals().add(ff);
                 } else {
                     nonBuggyGoals.add(ff);
                 }
             } else {
-                uncoveredGoals.add(ff);
+                getUncoveredGoals().add(ff);
             }
         }
 
-        LoggingUtils.getEvoLogger().info("* Total Number of Buggy Goals: " + uncoveredGoals.size());
+        LoggingUtils.getEvoLogger().info("* Total Number of Buggy Goals: " + getUncoveredGoals().size());
         LoggingUtils.getEvoLogger().info("* Total Number of Non-Buggy Goals: " + nonBuggyGoals.size());
 
         // initialize the dependency graph among branches
@@ -162,7 +162,7 @@ public class PredictiveCriteriaManager extends MultiCriteriaManager {
     }
 
     public void updateUncoveredGoals() {
-        this.uncoveredGoals.addAll(this.nonBuggyGoals);
+        this.getUncoveredGoals().addAll(this.nonBuggyGoals);
     }
 
     public void updateMethods() {

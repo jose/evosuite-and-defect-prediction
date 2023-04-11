@@ -19,15 +19,15 @@
  */
 package org.evosuite.ga.metaheuristics.mosa.structural;
 
+import org.evosuite.Properties;
+import org.evosuite.coverage.branch.BranchCoverageTestFitness;
 import org.evosuite.ga.archive.Archive;
 import org.evosuite.ga.metaheuristics.GeneticAlgorithm;
 import org.evosuite.testcase.TestChromosome;
 import org.evosuite.testcase.TestFitnessFunction;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A class for managing coverage targets based on structural dependencies. More specifically,
@@ -61,6 +61,9 @@ public abstract class StructuralGoalManager implements Serializable {
      */
     protected Archive archive;
 
+    /** Map of fitness functions to archived tests **/
+    private Map<String, Set<TestChromosome>> tests;
+
     /**
      * Creates a new {@code StructuralGoalManager} with the given list of targets.
      *
@@ -70,6 +73,7 @@ public abstract class StructuralGoalManager implements Serializable {
     protected StructuralGoalManager(List<TestFitnessFunction> fitnessFunctions) {
         currentGoals = new HashSet<>(fitnessFunctions.size());
         archive = Archive.getArchiveInstance();
+        tests = new HashMap<>(fitnessFunctions.size());
 
         // initialize uncovered goals
         this.archive.addTargets(fitnessFunctions);
@@ -135,5 +139,35 @@ public abstract class StructuralGoalManager implements Serializable {
 
         // update covered targets
         this.archive.updateArchive(f, tc, tc.getFitness(f));
+
+        if (this.archive.hasBeenUpdated()) {
+            if (Properties.BALANCE_TEST_COV) {
+                if (f instanceof BranchCoverageTestFitness) {
+                    addTestTo(f, tc);
+                }
+            }
+        }
+    }
+
+    private void removeFromTests(TestChromosome tc) {
+        for (Set<TestChromosome> testsForFf : tests.values()) {
+            testsForFf.remove(tc);
+        }
+    }
+
+    private void addTestTo(TestFitnessFunction f, TestChromosome tc) {
+        String ffName = f.toString();
+
+        if (tests.containsKey(ffName)) {
+            tests.get(ffName).add(tc);
+        } else {
+            Set<TestChromosome> testsForFitnessFunction = new HashSet<>();
+            testsForFitnessFunction.add(tc);
+            tests.put(ffName, testsForFitnessFunction);
+        }
+    }
+
+    public int getNumTests(String ffName) {
+        return this.tests.containsKey(ffName) ? this.tests.get(ffName).size() : 0;
     }
 }
