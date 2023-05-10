@@ -1423,8 +1423,8 @@ public class Properties {
         NONE, METHOD
     }
 
-    @Parameter(key = "defect_prediction_dir", description = "Directory in which defect scores are stored")
-    public static String DP_DIR = "defect-predictions";
+    @Parameter(key = "defect_prediction_csv", description = "Directory in which defect scores are stored")
+    public static String DP_CSV = "defect-predictions";
 
     @Parameter(key = "dp_input_format", description = "Format of the method signatures")
     public static MethodSignatureFormat DP_INPUT_FORMAT = MethodSignatureFormat.OWN_1;

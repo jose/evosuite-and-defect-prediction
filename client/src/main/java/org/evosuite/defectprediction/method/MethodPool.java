@@ -28,7 +28,7 @@ public class MethodPool {
     }
 
     public void loadDefectScores() {
-        String defectScoresFilename = Properties.DP_DIR + "/" + this.className + ".csv";
+        String defectScoresFilename = Properties.DP_CSV;
         this.methods = readDefectScores(defectScoresFilename);
     }
 
@@ -159,6 +159,10 @@ public class MethodPool {
                 String[] cells = row.split(",");
 
                 String fqMethodName = cells[0];
+
+                // if the method is not in the class, skip it
+                // TODO: test if this works
+                if (!fqMethodName.startsWith(this.className)) continue;
 
                 if (Properties.DP_INPUT_FORMAT == Properties.MethodSignatureFormat.OWN_1) {
                     fqMethodName = getFormattedFqMethodName(fqMethodName);
