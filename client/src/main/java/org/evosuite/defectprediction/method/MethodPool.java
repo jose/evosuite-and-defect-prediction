@@ -11,7 +11,7 @@ import java.util.*;
 public class MethodPool {
 
     private Map<String, Method> methods = new HashMap<>();
-    private String className;
+    private final String className;
 
     private double defaultWeight;
 
@@ -19,9 +19,8 @@ public class MethodPool {
     private double scaleDownFactor = 0.0;
 
     //  org.apache.commons.lang.math.NumberUtils.min(SSS)S -> org.apache.commons.lang.math.NumberUtils:min(short;short;short;)short:
-    private Map<String, String> equivalentMethodNames = new HashMap<>();
-
-    private static Map<String, MethodPool> instanceMap = new HashMap<String, MethodPool>();
+    private final Map<String, String> equivalentMethodNames = new HashMap<>();
+    private static final Map<String, MethodPool> instanceMap = new HashMap<String, MethodPool>();
 
     public MethodPool(String className) {
         this.className = className;
@@ -150,12 +149,16 @@ public class MethodPool {
     private Map<String, Method> readDefectScores(String filename) {
         Map<String, Method> methodsInFile = new HashMap<>();
 
+        LoggingUtils.getEvoLogger().info("Reading defect scores from: " + filename);
         try {
             Scanner s = new Scanner(new File(filename));
-            s.nextLine();
 
             while (s.hasNext()) {
                 String row = s.nextLine();
+
+                LoggingUtils.getEvoLogger().info("Row: " + row);
+                LoggingUtils.getEvoLogger().info("Class name: " + this.className);
+
                 String[] cells = row.split(",");
 
                 String fqMethodName = cells[0];
@@ -248,7 +251,7 @@ public class MethodPool {
     public int calculateNumTestCasesInZeroFront(String className, String methodName) {
         Method method = null;
         try {
-            method = getMethodsByEvoFormatName(className + "." + methodName);
+            method = getMethodsByEvoFormatName(className + "." + methodName, false);
             int numTestCasesInZeroFront = (int) Math.ceil(((int) (method.getWeight() / this.defaultWeight)) / this.scaleDownFactor);
             // return numTestCasesInZeroFront;
             return numTestCasesInZeroFront > 0 ? 1 : 0;
@@ -259,7 +262,19 @@ public class MethodPool {
         return 0;
     }
 
-    private Method getMethodsByEvoFormatName(String evoFormatName) throws Exception {
+    private Method getMethodsByEvoFormatName(String evoFormatName, boolean retry) throws Exception {
+        if (retry) {
+            LoggingUtils.getEvoLogger().info("Method: " + evoFormatName + " was not found.");
+            LoggingUtils.getEvoLogger().info("Retrying and loading again the defect score file.");
+            loadDefectScores();
+
+            // fixme: this assumes that the loaded file with defect scores follows the jvm format
+            // for the other format we must change the code below
+            for (String methodName : this.methods.keySet()) {
+                this.equivalentMethodNames.put(methodName, methodName);
+            }
+        }
+
         if (this.equivalentMethodNames.containsKey(evoFormatName)) {
             return getMethod(this.equivalentMethodNames.get(evoFormatName));
         }
@@ -274,13 +289,15 @@ public class MethodPool {
             }
         }
 
+        if (!retry) return getMethodsByEvoFormatName(evoFormatName, true);
+
         throw new Exception("Method does not exist in the MethodPool: " + evoFormatName);
     }
 
     public double getArchiveProbability(String className, String methodName) {
         Method method = null;
         try {
-            method = getMethodsByEvoFormatName(className + "." + methodName);
+            method = getMethodsByEvoFormatName(className + "." + methodName, false);
             return method.getArchiveProbability();
         } catch (Exception e) {
             e.printStackTrace();
@@ -295,9 +312,8 @@ public class MethodPool {
         if defect score is 0 -> non-buggy
      */
     public boolean isBuggy(String className, String methodName) {
-        Method method = null;
         try {
-            method = getMethodsByEvoFormatName(className + "." + methodName);
+            Method method = getMethodsByEvoFormatName(className + "." + methodName, false);
             return method.getDefectScore() == 1;
         } catch (Exception e) {
             e.printStackTrace();
