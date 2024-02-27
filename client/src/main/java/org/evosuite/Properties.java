@@ -1238,6 +1238,8 @@ public class Properties {
     @Parameter(key = "max_coverage_depth", group = "Output", description = "Maximum depth in the calltree to count a branch as covered")
     public static int MAX_COVERAGE_DEPTH = -1;
 
+    // ---------------------------------------------------------------
+    // Naming
     public enum TestNamingStrategy {
         NUMBERED, COVERAGE
     }
@@ -1250,6 +1252,13 @@ public class Properties {
 
     @Parameter(key = "log_age", group = "Output", description = "Log age of a test case")
     public static boolean LOG_AGE = false;
+
+    public enum VariableNamingStrategy {
+        TYPE_BASED, HEURISTICS_BASED
+    }
+
+    @Parameter(key = "variable_naming_strategy", group = "Output", description = "What strategy to use to derive names for variables")
+    public static VariableNamingStrategy VARIABLE_NAMING_STRATEGY = VariableNamingStrategy.TYPE_BASED;
 
     // ---------------------------------------------------------------
     // Sandbox
