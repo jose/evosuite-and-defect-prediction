@@ -99,6 +99,7 @@ public class NSGAChromosome extends Chromosome<NSGAChromosome> {
         c.setCoverageValues(this.getCoverageValues());
         c.setNumsOfCoveredGoals(this.getNumsOfCoveredGoals());
         c.updateAge(this.getAge());
+        c.updateTime(this.getTime());
         c.setRank(this.getRank());
         c.setDistance(this.getDistance());
         c.setNumberOfMutations(this.getNumberOfMutations());

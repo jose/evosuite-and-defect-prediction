@@ -39,6 +39,7 @@ import org.evosuite.ga.populationlimit.IndividualPopulationLimit;
 import org.evosuite.ga.populationlimit.PopulationLimit;
 import org.evosuite.ga.stoppingconditions.MaxGenerationStoppingCondition;
 import org.evosuite.ga.stoppingconditions.StoppingCondition;
+import org.evosuite.ga.stoppingconditions.MaxTimeStoppingCondition;
 import org.evosuite.symbolic.dse.DSEStatistics;
 import org.evosuite.testcase.execution.ExecutionTracer;
 import org.evosuite.testsuite.TestSuiteChromosome;
@@ -1034,5 +1035,16 @@ public abstract class GeneticAlgorithm<T extends Chromosome<T>> implements Searc
         }
 
         return (double) currentbudget / (double) totalbudget;
+    }
+
+    protected long getCurrentTime() {
+        for (StoppingCondition c : stoppingConditions) {
+            if (c instanceof MaxTimeStoppingCondition) {
+                long currentTimeMillis = ((MaxTimeStoppingCondition)c).getCurrentValueMillis();
+                org.evosuite.utils.LoggingUtils.getEvoLogger().info("GA.getCurrentTime() = " + currentTimeMillis);
+                return currentTimeMillis;
+            }
+        }
+        return 0;
     }
 }

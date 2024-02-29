@@ -987,6 +987,9 @@ public class Properties {
     @Parameter(key = "test_comments", group = "Output", description = "Include a header with coverage information for each test")
     public static boolean TEST_COMMENTS = false;
 
+    @Parameter(key = "log_time_taken", group = "Output", description = "Log time taken to generate each test case")
+    public static boolean LOG_TIME_TAKEN = false;
+
     @Parameter(key = "test_scaffolding", group = "Output", description = "Generate all the scaffolding needed to run EvoSuite JUnit tests in a separate file")
     public static boolean TEST_SCAFFOLDING = true;
 
