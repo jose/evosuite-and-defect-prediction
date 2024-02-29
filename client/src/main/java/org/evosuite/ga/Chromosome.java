@@ -102,6 +102,11 @@ public abstract class Chromosome<T extends Chromosome<T>>
     protected int age = 0;
 
     /**
+     * Time (in milliseconds) taken to generate this chromosome
+     */
+    protected long time = 0;
+
+    /**
      * The Pareto front this chromosome belongs to. The first non-dominated front is assigned rank
      * 0, the next front rank 1 and so on. A rank of -1 means undefined.
      */
@@ -531,6 +536,14 @@ public abstract class Chromosome<T extends Chromosome<T>>
 
     public int getAge() {
         return age;
+    }
+
+    public void updateTime(long time) {
+        this.time = time;
+    }
+
+    public long getTime() {
+        return this.time;
     }
 
     public int getRank() {

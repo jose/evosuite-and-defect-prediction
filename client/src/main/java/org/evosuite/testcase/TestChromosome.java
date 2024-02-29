@@ -132,6 +132,7 @@ public final class TestChromosome extends AbstractTestChromosome<TestChromosome>
         c.setNumberOfEvaluations(this.getNumberOfEvaluations());
         c.setKineticEnergy(getKineticEnergy());
         c.setNumCollisions(getNumCollisions());
+        c.updateTime(getTime());
 
         return c;
     }
@@ -735,5 +736,9 @@ public final class TestChromosome extends AbstractTestChromosome<TestChromosome>
         }
     }
 
-
+    @Override
+    public void updateTime(long time) {
+        super.updateTime(time); // Update chromosome's time
+        test.setTime(time); // Update test case's time
+    }
 }

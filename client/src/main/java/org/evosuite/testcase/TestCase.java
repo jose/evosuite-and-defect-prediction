@@ -50,6 +50,16 @@ public interface TestCase extends Iterable<Statement>, Cloneable, Listenable<Voi
     int getID();
 
     /**
+     * Set the time (in milliseconds) taken to generate this test.
+     */
+    void setTime(long time);
+
+    /**
+     * Get the time (in milliseconds) take to generate this test.
+     */
+    long getTime();
+
+    /**
      * Handle test visitor
      *
      * @param visitor a {@link org.evosuite.testcase.TestVisitor} object.
