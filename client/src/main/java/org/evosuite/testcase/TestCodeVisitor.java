@@ -438,11 +438,8 @@ public class TestCodeVisitor extends TestVisitor {
     @Override
     public void visitTestCase(TestCase test) {
         this.test = test;
-        this.testCode = "";
-        this.variableNameStrategy = VariableNameStrategyFactory.get();
         this.testCodeBuilder.setLength(0);
-        this.variableNames.clear();
-        this.nextIndices.clear();
+        this.variableNameStrategy = VariableNameStrategyFactory.get();
     }
 
     /**
