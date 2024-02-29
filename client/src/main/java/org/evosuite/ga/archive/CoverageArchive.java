@@ -101,11 +101,6 @@ public class CoverageArchive extends Archive {
             isNewSolutionBetterThanCurrent = this.isBetterThanCurrent(currentSolution, solution);
         }
 
-        // TODO: remove because the behaviour is different from the premosa previous version
-        if (Properties.ARCHIVE_ALL) {
-            isNewSolutionBetterThanCurrent = true;
-        }
-
         if (isNewCoveredTarget || isNewSolutionBetterThanCurrent) {
             // update the archive if a new target has been covered, or if solution covers already existing
             // covered targets but it has been considered a better solution
