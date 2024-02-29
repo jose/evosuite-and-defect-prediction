@@ -171,6 +171,7 @@ public abstract class AbstractMOSA extends GeneticAlgorithm<TestChromosome> {
             if (offspring1.isChanged()) {
                 this.clearCachedResults(offspring1);
                 offspring1.updateAge(this.currentIteration);
+                offspring1.updateTime(this.getCurrentTime());
                 this.calculateFitness(offspring1);
                 offspringPopulation.add(offspring1);
             }
@@ -180,6 +181,7 @@ public abstract class AbstractMOSA extends GeneticAlgorithm<TestChromosome> {
             if (offspring2.isChanged()) {
                 this.clearCachedResults(offspring2);
                 offspring2.updateAge(this.currentIteration);
+                offspring2.updateTime(this.getCurrentTime());
                 this.calculateFitness(offspring2);
                 offspringPopulation.add(offspring2);
             }
@@ -197,6 +199,7 @@ public abstract class AbstractMOSA extends GeneticAlgorithm<TestChromosome> {
             }
             if (tch.isChanged()) {
                 tch.updateAge(this.currentIteration);
+                tch.updateTime(this.getCurrentTime());
                 this.calculateFitness(tch);
                 offspringPopulation.add(tch);
             }

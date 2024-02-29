@@ -46,6 +46,7 @@ public class TestSerialization {
         chromosome.setFitness(null, fitness);
         chromosome.setCoverage(null, 0.5);
         chromosome.updateAge(24);
+        chromosome.updateTime(3);
         chromosome.setChanged(true);
         chromosome.addTest(testChromosome);
         oos.writeObject(chromosome);

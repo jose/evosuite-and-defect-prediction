@@ -135,6 +135,7 @@ public class CellularGA<T extends Chromosome<T>> extends GeneticAlgorithm<T> {
 
             if (bestOffspring.isChanged()) {
                 bestOffspring.updateAge(currentIteration);
+                bestOffspring.updateTime(this.getCurrentTime());
             }
 
             if (bestOffspring.size() > 0 && !isTooLong(bestOffspring))

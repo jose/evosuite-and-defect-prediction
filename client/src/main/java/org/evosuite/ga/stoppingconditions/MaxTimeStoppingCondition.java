@@ -116,6 +116,11 @@ public class MaxTimeStoppingCondition<T extends Chromosome<T>> extends StoppingC
         return (currentTime - startTime) / 1000;
     }
 
+    public long getCurrentValueMillis() {
+        long currentTime = System.currentTimeMillis();
+        return (currentTime - startTime);
+    }
+
     /**
      * {@inheritDoc}
      */

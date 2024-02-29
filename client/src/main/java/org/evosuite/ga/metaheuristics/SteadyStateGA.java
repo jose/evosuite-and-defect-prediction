@@ -77,9 +77,11 @@ public class SteadyStateGA<T extends Chromosome<T>> extends MonotonicGA<T> {
 
             if (offspring1.isChanged()) {
                 offspring1.updateAge(currentIteration);
+                offspring1.updateTime(this.getCurrentTime());
             }
             if (offspring2.isChanged()) {
                 offspring2.updateAge(currentIteration);
+                offspring2.updateTime(this.getCurrentTime());
             }
 
 

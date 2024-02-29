@@ -88,6 +88,8 @@ public class DefaultTestCase implements TestCase, Serializable {
 
     private int id;
 
+    private long time;
+
     /**
      * Constructs an empty test case, i.e., initially containing no statements.
      */
@@ -98,6 +100,16 @@ public class DefaultTestCase implements TestCase, Serializable {
 
     public int getID() {
         return id;
+    }
+
+    @Override
+    public void setTime(long time) {
+        this.time = time;
+    }
+
+    @Override
+    public long getTime() {
+        return this.time;
     }
 
     /* (non-Javadoc)
@@ -388,6 +400,7 @@ public class DefaultTestCase implements TestCase, Serializable {
         t.id = idGenerator.getAndIncrement(); //always create new ID when making a clone
         //t.exception_statement = exception_statement;
         //t.exceptionThrown = exceptionThrown;
+        t.time = time;
         return t;
     }
 

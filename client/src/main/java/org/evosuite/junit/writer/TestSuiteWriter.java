@@ -655,6 +655,13 @@ public class TestSuiteWriter implements Opcodes {
         builder.append(" {");
         builder.append(NEWLINE);
 
+        // long time taken to generate the test case
+        if (Properties.LOG_TIME_TAKEN) {
+            builder.append(INNER_BLOCK_SPACE);
+            builder.append("// time taken = ");
+            builder.append(testInfo);
+        }
+
         // ---------   start with the body -------------------------
         String CODE_SPACE = INNER_BLOCK_SPACE;
 
@@ -750,6 +757,10 @@ public class TestSuiteWriter implements Opcodes {
         }
 
         TestCase test = testCases.get(num);
+        if (Properties.LOG_TIME_TAKEN) {
+            String time = test.getTime() + NEWLINE;
+            return time;
+        }
         Set<TestFitnessFunction> coveredGoals = test.getCoveredGoals();
 
         StringBuilder builder = new StringBuilder();
