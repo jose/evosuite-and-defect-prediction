@@ -1041,7 +1041,6 @@ public abstract class GeneticAlgorithm<T extends Chromosome<T>> implements Searc
         for (StoppingCondition c : stoppingConditions) {
             if (c instanceof MaxTimeStoppingCondition) {
                 long currentTimeMillis = ((MaxTimeStoppingCondition)c).getCurrentValueMillis();
-                org.evosuite.utils.LoggingUtils.getEvoLogger().info("GA.getCurrentTime() = " + currentTimeMillis);
                 return currentTimeMillis;
             }
         }
